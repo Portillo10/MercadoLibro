@@ -8,7 +8,7 @@ const router = Router();
 
 router.get("/all", getAllInventory);
 
-router.get("/", [validateJWT, validate], getOwnInventory);
+router.get("/", [validateJWT, sellerRol, validate], getOwnInventory);
 
 router.post("/", [
   validateJWT,

@@ -19,7 +19,10 @@ const Book = db.define(
     },
     seller: {
       type: DataTypes.STRING
-    }
+    },
+    state:{
+      type: DataTypes.BOOLEAN,
+    },
   },
   {
     createdAt: false,

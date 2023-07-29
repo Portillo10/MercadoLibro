@@ -1,7 +1,12 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
 const { validate } = require("../middlewares/validate.middleware");
-const { postBook, getAllBooks, getBookBySeller } = require("../controllers/books.controller");
+const {
+  postBook,
+  getAllBooks,
+  getBookBySeller,
+  deleteBook,
+} = require("../controllers/books.controller");
 const { validateJWT } = require("../middlewares/validateJWT.middleware");
 const { sellerRol } = require("../middlewares/user.middleware");
 const { validBook } = require("../middlewares/books.middleware");
@@ -10,7 +15,7 @@ const router = Router();
 
 router.get("/", [validateJWT, sellerRol, validate], getBookBySeller);
 
-router.get("/all", getAllBooks)
+router.get("/all", getAllBooks);
 
 router.post(
   "/",
@@ -25,6 +30,17 @@ router.post(
     validate,
   ],
   postBook
+);
+
+router.delete(
+  "/",
+  [
+    validateJWT,
+    check("book_id", "is mandatory").notEmpty(),
+    sellerRol,
+    validate,
+  ],
+  deleteBook
 );
 
 module.exports = router;

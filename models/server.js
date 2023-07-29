@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const fileUpload = require('express-fileupload')
 
 const cookieParser = require("cookie-parser");
 // const { dbConnection } = require('../database/config-db')
@@ -24,13 +25,20 @@ class Server {
     this.app.use("/auth", require("../routes/authlogin.routes"));
     this.app.use("/signup", require("../routes/sing-up.routes"));
     this.app.use("/book", require("../routes/Books.routes"));
-    this.app.use("/books", require("../routes/inventory.routes"))
+    this.app.use("/books", require("../routes/inventory.routes"));
+    this.app.use("/sales", require("../routes/sales.routes"));
+    this.app.use("/upload", require("../routes/files.routes"));
   }
 
   middlewares() {
     // cors
+    this.app.use(cors());
+
     this.app.use(
-      cors()
+      fileUpload({
+        useTempFiles: true,
+        tempFileDir: "/tmp/",
+      })
     );
 
     // lecture del body

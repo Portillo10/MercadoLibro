@@ -4,7 +4,7 @@ const { formatInv, formatInvSeller } = require("../helpers/invFormatt.helper");
 
 const getAllInventory = async (req, res) => {
   try {
-    const inventory = await db.query(`select * from all_books;`);
+    const inventory = await db.query(`select * from all_books where stock > 0;`);
 
     const invent = formatInv(inventory[0]);
 
@@ -47,12 +47,13 @@ const getOwnInventory = async (req, res) => {
   }
 };
 
+
 const deleteInventory = async (req, res) => {
 
   try{
-    const {invent_id} = req.body
+    const {invent_id} = req.query
 
-    const deleteInv = await deleteInvByPK(invent_id)
+    const deleteInv = await Inventory.destroy({ where: { id: invent_id } });
 
     if (deleteInv <= 0) return res.status(401).json({msg:'Invent no exist'})
 
@@ -64,19 +65,6 @@ const deleteInventory = async (req, res) => {
   }
 };
 
-const deleteInvByPK = async (PK) => {
-
-  try {
-
-    const deleteInv = await Inventory.destroy({ where: { id: PK } });
-
-    return deleteInv
-
-  } catch (error) {
-    console.log(error);
-    return res.status(500);
-  }
-};
 
 module.exports = {
   getAllInventory,

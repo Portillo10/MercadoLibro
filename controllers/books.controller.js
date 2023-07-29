@@ -2,17 +2,18 @@ const Book = require("../models/book");
 const Genre = require("../models/genre");
 const { v4: uuidv4 } = require("uuid");
 const {asignSeller, getGenres, addGenres} = require('../helpers/books.helper')
+const db = require('../database/config-mysql')
 
 const getBookBySeller = async (req, res) => {
   const { user } = req;
 
-  const books = await Book.findAll({ where: { seller: user.id } });
+  const books = await Book.findAll({ where: { seller: user.id, state:true } });
 
   await resBooks(books, res);
 };
 
 const getAllBooks = async (req, res) => {
-  const books = await Book.findAll();
+  const books = await Book.findAll({where:{state:true}});
 
   await asignSeller(books);
 
@@ -63,11 +64,11 @@ const resBooks = async (books, res) => {
 const deleteBook = async (req, res) => {
   try{
 
-    const {book} = req.query;
-    const deletedBooks = await Book.destroy({where:{id:book}})
+    const {book_id} = req.query;
+    // const deletedBooks = await Book.destroy({where:{id:book_id}})
+    await db.query(`call delete_book("${book_id}")`)
 
-    if (book > 0) res.status(200).json({
-      book,
+    res.status(200).json({
       msg:'Book deleted successfully'
     })
   }catch(error){
@@ -76,13 +77,10 @@ const deleteBook = async (req, res) => {
   }
 }
 
-const sellBook = async (req, res) => {
-  
-}
-
 module.exports = {
   getAllBooks,
   postBook,
   getBookBySeller,
+  deleteBook
 };
 
