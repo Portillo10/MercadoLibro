@@ -33,7 +33,7 @@ const login = async (req = request, res = response) => {
 
     if (!token) return res.status(403).json({ msg: "invalid token" });
 
-    res.cookie("api-key", token);
+    res.cookie("token", token);
 
     res.json({
       provUser,

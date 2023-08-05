@@ -10,6 +10,7 @@ const {
 const { validateJWT } = require("../middlewares/validateJWT.middleware");
 const { sellerRol } = require("../middlewares/user.middleware");
 const { validBook } = require("../middlewares/books.middleware");
+const { upload } = require("../controllers/multer-config");
 
 const router = Router();
 
@@ -28,6 +29,7 @@ router.post(
     sellerRol,
     validBook,
     validate,
+    upload
   ],
   postBook
 );

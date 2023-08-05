@@ -1,43 +1,57 @@
-const { saleFormatt, allowQuantity, sellBooks } = require("../helpers/sale.helper");
+const {
+  saleFormatt,
+  allowQuantity,
+  sellBooks,
+} = require("../helpers/sale.helper");
 const Sale = require("../models/sale.model");
 const Sale_details = require("../models/sale_details.model");
 const { v4: uuidv4 } = require("uuid");
+const StripeManager = require("../classes/stripe-manager");
 
 const postPurchase = async (req, res) => {
-  const { user, body } = req;
-
-  const { detail, ...rest } = body;
+  const { user, query } = req;
+  const { sessionId } = query;
 
   try {
-    const sale = new Sale({ ...rest, customer: user.id, id: uuidv4() });
+    const session = StripeManager.getSession(sessionId);
 
-    const obj = detail.map((det) => {
-      return { id: det.book, quantity: det.quantity };
-    });
+    console.log(session);
 
-    if (!await allowQuantity(obj)) {
-      return res.status(401).json({
-        msg: 'no stock'
-      })
+    if (!session) {
+      return res.status(500).json({ msg: "Session expired" });
     }
 
-    await sale.save();
-    await saveDetails(detail, sale.id);
-    await sellBooks(obj)
+    const sale = new Sale({
+      address: session.address,
+      customer: user.id,
+      id: uuidv4(),
+    });
 
-    res.status(200).json({sale});
+    await sale.save();
+    await saveDetails(session.line_items, sale.id);
+    await sellBooks(session.line_items);
+
+    // await sendPayment(3152599715, 2000)
+    StripeManager.removeSession(sessionId);
+
+    return res.status(200).json({ session });
   } catch (error) {
     console.log(error);
-    return res.status(500);
+    return res.status(500).json(error);
   }
 };
 
 const saveDetails = async (details = [], sale) => {
   try {
+    let total = 0;
+
     details.forEach(async (detail) => {
-      let sale_detail = new Sale_details({ ...detail, sale });
+      const { first_hand, id, name, description, ...rest } = detail;
+      let sale_detail = new Sale_details({ ...rest, sale });
       await sale_detail.save();
+      total += detail.quantity * detail.unity_price;
     });
+    return total;
   } catch (error) {
     throw new Error();
   }
@@ -54,6 +68,19 @@ const getSales = async (req, res) => {
     res.status(200).json({
       result,
     });
+  } catch (error) {
+    console.log(error);
+    return res.status(500);
+  }
+};
+
+const cancelPurchase = async (req, res) => {
+  const { sessionId } = req.query;
+
+  try {
+    return res
+      .status(200)
+      .json({ removedSession: StripeManager.removeSession(sessionId) });
   } catch (error) {
     console.log(error);
     return res.status(500);
@@ -77,4 +104,4 @@ const getPurchases = async (req, res) => {
   }
 };
 
-module.exports = { getSales, getPurchases, postPurchase };
+module.exports = { getSales, getPurchases, postPurchase, cancelPurchase };

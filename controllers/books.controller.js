@@ -1,8 +1,8 @@
 const Book = require("../models/book");
 const Genre = require("../models/genre");
 const { v4: uuidv4 } = require("uuid");
-const {asignSeller, getGenres, addGenres} = require('../helpers/books.helper')
-const db = require('../database/config-mysql')
+const {asignSeller, getGenres, addGenres, addImages} = require('../helpers/books.helper')
+const db = require('../database/config-mysql');
 
 const getBookBySeller = async (req, res) => {
   const { user } = req;
@@ -31,6 +31,15 @@ const postBook = async (req, res) => {
     await book.save();
     await addGenres(genres, book.id);
     const generos = await Genre.findAll({ where: { id: genres } });
+
+    console.log(req.files);
+
+    if (req.files){
+      // console.log(filesUploaded);
+
+      const routeList = req.files.map((file) => {return {route: file.filename, book: book.id}})
+      addImages(routeList)
+    }
     // console.log(book);
     res.json({
       book,

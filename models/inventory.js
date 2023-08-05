@@ -5,7 +5,7 @@ const Inventory = db.define(
   "Inventory",
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       primaryKey: true,
       autoIncrement: true
     },

@@ -1,6 +1,7 @@
 const Inventory = require("../models/inventory");
 const db = require("../database/config-mysql");
 const { formatInv, formatInvSeller } = require("../helpers/invFormatt.helper");
+const {v4:uuidv4} = require("uuid")
 
 const getAllInventory = async (req, res) => {
   try {
@@ -19,7 +20,7 @@ const postInventory = async (req, res) => {
   try {
     const { body } = req;
 
-    const invent = new Inventory(body);
+    const invent = new Inventory({...body, id: uuidv4()});
 
     await invent.save();
 

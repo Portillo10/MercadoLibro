@@ -4,7 +4,7 @@ const User = require("../models/User")
 
 const validateJWT = async (req = request, res = response, next) => {
   
-  const token = req.header("api-key");
+  const {token} = req.cookies;
 
   if (!token) {
     return res.status(401).json({

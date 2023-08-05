@@ -4,15 +4,13 @@ const db = require('../database/config-mysql');
 const Book_images = db.define(
   'Book_images',
   {
-    id:{
-      type: DataTypes.INTEGER,
-      primaryKey: true
-    },
     book:{
       type: DataTypes.STRING,
+      primaryKey: true
     },
     route:{
       type: DataTypes.STRING,
+      primaryKey: true
     },
   },
   {

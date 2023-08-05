@@ -2,6 +2,7 @@ const Genre_Book = require("../models/book_genre");
 const db = require("../database/config-mysql");
 const ROLES = require("../helpers/role_enum");
 const User = require("../models/User");
+const Book_images = require('../models/book_images')
 
 const addGenres = async (genres = [], bookid) => {
 
@@ -52,8 +53,27 @@ const asignSeller = async (books) => {
   }
 };
 
+const addImages = async (images = []) => {
+
+  try{
+
+    images.forEach(async (image) => {
+      console.log(image);
+      const bookImage = new Book_images(image)
+      await bookImage.save()
+    })
+    
+  }catch(error){
+    console.log(error)
+    throw new Error
+  }
+
+}
+
+
 module.exports = {
   getGenres,
   addGenres,
-  asignSeller
+  asignSeller,
+  addImages
 }
