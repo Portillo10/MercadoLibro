@@ -1,9 +1,8 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
-const { getAllInventory, postInventory, getOwnInventory, deleteInventory } = require("../controllers/inventory.controller");
-const { validateJWT } = require("../middlewares/validateJWT.middleware");
-const { validate } = require("../middlewares/validate.middleware");
-const { sellerRol } = require("../middlewares/user.middleware");
+const { getAllInventory, postInventory, getOwnInventory, deleteInventory } = require("../controllers");
+const { validateJWT, validate, sellerRol } = require("../middlewares");
+
 const router = Router();
 
 router.get("/all", getAllInventory);

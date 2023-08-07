@@ -1,19 +1,24 @@
 const Book = require("../models/book");
 const Genre = require("../models/genre");
 const { v4: uuidv4 } = require("uuid");
-const {asignSeller, getGenres, addGenres, addImages} = require('../helpers/books.helper')
-const db = require('../database/config-mysql');
+const {
+  asignSeller,
+  getGenres,
+  addGenres,
+  addImages,
+} = require("../helpers/books.helper");
+const db = require("../database/config-mysql");
 
 const getBookBySeller = async (req, res) => {
   const { user } = req;
 
-  const books = await Book.findAll({ where: { seller: user.id, state:true } });
+  const books = await Book.findAll({ where: { seller: user.id, state: true } });
 
   await resBooks(books, res);
 };
 
 const getAllBooks = async (req, res) => {
-  const books = await Book.findAll({where:{state:true}});
+  const books = await Book.findAll({ where: { state: true } });
 
   await asignSeller(books);
 
@@ -32,15 +37,13 @@ const postBook = async (req, res) => {
     await addGenres(genres, book.id);
     const generos = await Genre.findAll({ where: { id: genres } });
 
-    console.log(req.files);
-
-    if (req.files){
-      // console.log(filesUploaded);
-
-      const routeList = req.files.map((file) => {return {route: file.filename, book: book.id}})
-      addImages(routeList)
+    if (req.files) {
+      const routeList = req.files.map((file) => {
+        return { route: file.filename, book: book.id };
+      });
+      addImages(routeList);
     }
-    // console.log(book);
+
     res.json({
       book,
       generos,
@@ -53,10 +56,8 @@ const postBook = async (req, res) => {
   }
 };
 
-
 const resBooks = async (books, res) => {
   try {
-
     await getGenres(books);
 
     res.json({
@@ -71,25 +72,23 @@ const resBooks = async (books, res) => {
 };
 
 const deleteBook = async (req, res) => {
-  try{
-
-    const {book_id} = req.query;
+  try {
+    const { book_id } = req.query;
     // const deletedBooks = await Book.destroy({where:{id:book_id}})
-    await db.query(`call delete_book("${book_id}")`)
+    await db.query(`call delete_book("${book_id}")`);
 
     res.status(200).json({
-      msg:'Book deleted successfully'
-    })
-  }catch(error){
-    console.log(error)
-    return res.status(500)
+      msg: "Book deleted successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500);
   }
-}
+};
 
 module.exports = {
   getAllBooks,
   postBook,
   getBookBySeller,
-  deleteBook
+  deleteBook,
 };
-

@@ -1,12 +1,9 @@
 const {Router} = require('express')
 const {check} = require('express-validator')
-const { singUp } = require('../controllers/sign-up.controller')
-const { validate } = require('../middlewares/validate.middleware')
-const { dniExist, emailExist } = require('../middlewares/UniqueData.middleware')
+const { singUp } = require('../controllers')
+const { validate, dniExist, emailExist } = require('../middlewares')
 
 const router = Router()
-
-// router.get()
 
 router.post('/',[
   check('email', 'Email is mandatory').custom(emailExist).notEmpty(),

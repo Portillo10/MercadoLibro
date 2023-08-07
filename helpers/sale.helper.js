@@ -1,7 +1,6 @@
 const Sale_details = require("../models/sale_details.model");
 const Inventory = require("../models/inventory");
 const db = require("../database/config-mysql");
-const axios = require("axios");
 
 const saleFormatt = async (saleList) => {
   try {
@@ -88,112 +87,20 @@ const sellBooks = async (booklist = []) => {
   });
 };
 
-const getToken = async () => {
-  const nequiUrl = "https://oauth.sandbox.nequi.com";
-
+const saveDetails = async (details = [], sale) => {
   try {
-    const response = await axios.post(
-      `${nequiUrl}/oauth2/token`,
-      {
-        grant_type: "client_credentials",
-      },
-      {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/x-www-form-urlencoded",
-          Authorization: `Basic ${Buffer.from(
-            `${process.env.clientId}:${process.env.clientSecret}`
-          ).toString("base64")}`,
-        },
-      }
-    );
-    return response.data.access_token;
-  } catch (error) {
-    // console.error("Error al obtener el token:", error);
-    throw error;
-  }
-};
-const sendPayment = async (phoneNumber, value) => {
-  const headers = {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-    Authorization: await getToken(),
-    "x-api-key": process.env.NEQUI_API_KEY,
-  };
+    let total = 0;
 
-  const endpoint = `${"https://api.sandbox.nequi.com"}${"/payments/v2/-services-paymentservice-unregisteredpayment"}`;
-
-  const data = {
-    RequestMessage: {
-      RequestHeader: {
-        Channel: "PNP04-C001",
-        RequestDate: "2020-01-17T20:26:12.654Z",
-        MessageID: "1234567890",
-        ClientID: "12345",
-        Destination: {
-          ServiceName: "PaymentsService",
-          ServiceOperation: "unregisteredPayment",
-          ServiceRegion: "C001",
-          ServiceVersion: "1.2.0",
-        },
-      },
-      RequestBody: {
-        any: {
-          unregisteredPaymentRQ: {
-            phoneNumber: "3213100058",
-            code: "NIT_1",
-            value: "1000",
-            reference1: "Referencia numero 1",
-            reference2: "Referencia numero 2",
-            reference3: "Referencia numero 3",
-          },
-        },
-      },
-    },
-  };
-
-  try {
-    const response = await axios.request({
-      url: endpoint,
-      method: "POST",
-      headers,
-      data,
+    details.forEach(async (detail) => {
+      const { first_hand, id, name, description, id: book, ...rest } = detail;
+      let sale_detail = new Sale_details({ ...rest, book, sale });
+      await sale_detail.save();
+      total += detail.quantity * detail.unity_price;
     });
-
-    if (!!response && response.status === 200 && response.data) {
-      const { data } = response;
-      const { StatusCode: statusCode = "", StatusDesc: statusDesc = "" } =
-        data.ResponseMessage.ResponseHeader.Status;
-
-      if (statusCode === 0) {
-        const { transactionId = "" } =
-          data.ResponseMessage.ResponseBody.any.unregisteredPaymentRS;
-
-        console.info(
-          "Solicitud de pago realizada correctamente\n" +
-            `- Id Transacción -> ${transactionId.trim()}`
-        );
-      } else {
-        throw new Error(`Error ${statusCode} = ${statusDesc}`);
-      }
-    } else {
-      throw new Error(
-        "Unable to connect to Nequi, please check the information sent."
-      );
-    }
+    return total;
   } catch (error) {
-    let msgError = "";
-
-    if (error.isAxiosError) {
-      const { status = "Undefined", statusText = "Undefined" } = error.response;
-
-      msgError = `Axios error ${status} -> ${statusText}`;
-
-      throw new Error("FINAL" + msgError);
-    } else {
-      throw error;
-    }
+    throw new Error();
   }
 };
 
-module.exports = { saleFormatt, allowQuantity, sellBooks, sendPayment };
+module.exports = { saleFormatt, allowQuantity, sellBooks, saveDetails };

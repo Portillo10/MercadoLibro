@@ -1,7 +1,4 @@
-const Role = require("../models/role");
 const ROLES = require("../helpers/role_enum")
-// const roles = Role.findAll();
-
 
 const sellerRol = async (req, res, next) => {
   const { user } = req;

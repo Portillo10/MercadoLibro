@@ -1,8 +1,6 @@
 const { response, request } = require("express");
-const { v4: uuidv4 } = require("uuid");
 const { generateJWT } = require("../helpers/generate-jwt");
-// const db = require('../database/config-mysql')
-const User = require("../models/User");
+const User = require("../models/User.model");
 const bcrypt = require("bcryptjs");
 
 const login = async (req = request, res = response) => {

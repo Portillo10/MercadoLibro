@@ -1,16 +1,7 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
-const { validate } = require("../middlewares/validate.middleware");
-const {
-  postBook,
-  getAllBooks,
-  getBookBySeller,
-  deleteBook,
-} = require("../controllers/books.controller");
-const { validateJWT } = require("../middlewares/validateJWT.middleware");
-const { sellerRol } = require("../middlewares/user.middleware");
-const { validBook } = require("../middlewares/books.middleware");
-const { upload } = require("../controllers/multer-config");
+const { validate, validateJWT, sellerRol, validBook } = require("../middlewares");
+const { postBook, getAllBooks, getBookBySeller, deleteBook, upload } = require("../controllers");
 
 const router = Router();
 
@@ -29,7 +20,7 @@ router.post(
     sellerRol,
     validBook,
     validate,
-    upload
+    upload,
   ],
   postBook
 );

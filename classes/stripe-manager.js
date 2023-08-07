@@ -7,11 +7,7 @@ setInterval(() => {
       StripeManager.removeSession(session.id)
     }
   });
-}, 20000);
-
-setInterval(() => {
-  
-}, 900000);
+}, 200000);
 
 
 class StripeManager {

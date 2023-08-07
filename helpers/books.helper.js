@@ -1,7 +1,7 @@
 const Genre_Book = require("../models/book_genre");
 const db = require("../database/config-mysql");
 const ROLES = require("../helpers/role_enum");
-const User = require("../models/User");
+const User = require("../models/User.model");
 const Book_images = require('../models/book_images')
 
 const addGenres = async (genres = [], bookid) => {
@@ -69,7 +69,6 @@ const addImages = async (images = []) => {
   }
 
 }
-
 
 module.exports = {
   getGenres,

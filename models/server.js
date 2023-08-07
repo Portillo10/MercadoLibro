@@ -1,17 +1,15 @@
-const express = require("express");
-const cors = require("cors");
-const path = require('path')
-// const fileUpload = require('express-fileupload')
-
-
-const cookieParser = require("cookie-parser");
-// const { dbConnection } = require('../database/config-db')
+const express  = require("express");
+const cors     = require("cors");
+const path     = require('path')
+const app      = express();
+const server   = require('http').createServer(app)
+const io       = require('socket.io')(server)
+const cookieParser    = require("cookie-parser");
 const MySQLconnection = require("../database/config-mysql");
 
 class Server {
   constructor() {
-    this.app = express();
-    this.port = process.env.PORT || 3000;
+    this.port     = process.env.PORT || 3000;
     this.authPath = "/api/auth";
     // Conexion a la base de datos
     this.ConnectionDB();
@@ -21,34 +19,39 @@ class Server {
     this.config();
 
     this.routes();
+
+    this.socket();
   }
 
   routes() {
-    this.app.use("/auth", require("../routes/authlogin.routes"));
-    this.app.use("/signup", require("../routes/sing-up.routes"));
-    this.app.use("/book", require("../routes/Books.routes"));
-    this.app.use("/books", require("../routes/inventory.routes"));
-    this.app.use("/sales", require("../routes/sales.routes"));
-    this.app.use("/upload", require("../routes/files.routes"));
-    this.app.use("/payment", require("../routes/payment.routes"));
+    app.use("/auth", require("../routes/authlogin.routes"));
+    app.use("/signup", require("../routes/sing-up.routes"));
+    app.use("/book", require("../routes/Books.routes"));
+    app.use("/books", require("../routes/inventory.routes"));
+    app.use("/sales", require("../routes/sales.routes"));
+    app.use("/payment", require("../routes/payment.routes"));
   }
 
   middlewares() {
     // cors
-    this.app.use(cors());
+    app.use(cors());
 
     // lecture del body
-    this.app.use(express.urlencoded({ extended: false }));
+    app.use(express.urlencoded({ extended: false }));
 
-    this.app.use(express.json());
+    app.use(express.json());
 
-    this.app.use(cookieParser());
+    app.use(cookieParser());
 
-    this.app.use(express.static(path.join(__dirname, "../public")));
+    app.use(express.static(path.join(__dirname, "../public")));
+  }
+
+  socket() {
+    require('../sockets/socket-config')
   }
 
   listen() {
-    this.app.listen(this.port, () => {
+    server.listen(this.port, () => {
       console.log("servidor corriendo en el puerto " + this.port);
     });
   }
@@ -69,4 +72,4 @@ class Server {
   }
 }
 
-module.exports = Server;
+module.exports = {Server, io};

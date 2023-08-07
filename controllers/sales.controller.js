@@ -1,10 +1,9 @@
 const {
   saleFormatt,
-  allowQuantity,
   sellBooks,
+  saveDetails
 } = require("../helpers/sale.helper");
 const Sale = require("../models/sale.model");
-const Sale_details = require("../models/sale_details.model");
 const { v4: uuidv4 } = require("uuid");
 const StripeManager = require("../classes/stripe-manager");
 
@@ -14,8 +13,6 @@ const postPurchase = async (req, res) => {
 
   try {
     const session = StripeManager.getSession(sessionId);
-
-    console.log(session);
 
     if (!session) {
       return res.status(500).json({ msg: "Session expired" });
@@ -38,22 +35,6 @@ const postPurchase = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);
-  }
-};
-
-const saveDetails = async (details = [], sale) => {
-  try {
-    let total = 0;
-
-    details.forEach(async (detail) => {
-      const { first_hand, id, name, description, ...rest } = detail;
-      let sale_detail = new Sale_details({ ...rest, sale });
-      await sale_detail.save();
-      total += detail.quantity * detail.unity_price;
-    });
-    return total;
-  } catch (error) {
-    throw new Error();
   }
 };
 
