@@ -3,7 +3,8 @@ const cors     = require("cors");
 const path     = require('path')
 const app      = express();
 const server   = require('http').createServer(app)
-const io       = require('socket.io')(server)
+const {Server:SocketServer} = require('socket.io')
+const io = new SocketServer(server)
 const cookieParser    = require("cookie-parser");
 const MySQLconnection = require("../database/config-mysql");
 
@@ -34,14 +35,18 @@ class Server {
 
   middlewares() {
     // cors
-    app.use(cors());
+    app.use(cors({
+      origin:true,
+      credentials: true
+    }));
 
+    app.use(cookieParser());
+
+    app.use(express.json());
+    
     // lecture del body
     app.use(express.urlencoded({ extended: false }));
 
-    app.use(express.json());
-
-    app.use(cookieParser());
 
     app.use(express.static(path.join(__dirname, "../public")));
   }

@@ -1,11 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
-  <h3>Bienvenido</h3>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h3>Bienvenido</h3>
+    <script>
+      (async () => {
+        fetch("http://localhost:5000/auth", {
+          method: 'POST',
+          body: JSON.stringify({
+            email: "port@gmail.com",
+            password: "Portillo-10",
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((res) => res.json())
+          .then((res) => console.log(res));
+      })();
+    </script>
+  </body>
 </html>

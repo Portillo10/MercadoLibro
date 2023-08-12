@@ -6,6 +6,8 @@ const validateJWT = async (req = request, res = response, next) => {
   
   const {token} = req.cookies;
 
+  console.log(req.cookies);
+
   if (!token) {
     return res.status(401).json({
       msg: "Token mandatory",
@@ -17,7 +19,9 @@ const validateJWT = async (req = request, res = response, next) => {
 
     const user = await User.findByPk(uid)
 
-    req.user = user
+    const {cifred_password, ...userData} = user.dataValues
+
+    req.user = userData
 
     next();
   } catch (error) {

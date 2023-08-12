@@ -31,10 +31,13 @@ const login = async (req = request, res = response) => {
 
     if (!token) return res.status(403).json({ msg: "invalid token" });
 
+    const {cifred_password, ...userData} = provUser.dataValues
+
     res.cookie("token", token);
 
     res.json({
-      provUser,
+      userData,
+      token
     });
   } catch (error) {
     console.log(error);
@@ -44,6 +47,20 @@ const login = async (req = request, res = response) => {
   }
 };
 
+const refreshToken = async (req, res) => {
+
+  const { user } = req;
+
+  if (!user) return res.status(400).json({error:'invalid token'})
+
+  const token = await generateJWT(user.id)
+
+  res.cookie("token", token)
+
+  res.status(200).json({ user });
+};
+
 module.exports = {
   login,
+  refreshToken
 };
